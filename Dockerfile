@@ -1,41 +1,49 @@
-from continuumio/miniconda3
+# ------------------------ BUILD ----------------------- #
 
-# geospatial libraries
-RUN apt-get update && apt-get install -y binutils libproj-dev
-# gdal-bin
+FROM python:3.9-slim-buster AS builder
 
-RUN conda install "python<3.8"
+# Install build requirements
+RUN apt-get update && apt-get upgrade -y \
+	&& apt-get install -y --no-install-recommends \
+	build-essential \
+	git \
+	libgdal-dev
 
-RUN conda config --remove channels defaults
-RUN conda config --append channels conda-forge
+# Create and activate a Python virtual environment
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN conda update conda
+# Install Python requirements
+COPY requirements.txt .
+RUN pip install -U pip \
+	&& pip install -r requirements.txt \
+	&& git clone https://github.com/joefutrelle/pyifcb \
+	&& pip install ./pyifcb
 
-# nomkl to reduce image size (mkl is large)
-RUN conda install -c conda-forge nomkl conda-merge
+# ------------------------ RUN ------------------------ #
 
-# install pyifcb and ifcbdb dependencies first
-# pyifcb must be cloned into the same directory as this dockerfile
+FROM python:3.9-slim-buster
 
-WORKDIR /pyifcb
-COPY ./pyifcb .
-COPY ./pyifcb/environment.yml /envs/pyifcb_env.yml
+# Copy production ready venv from builder
+ENV VIRTUAL_ENV="/opt/venv"
+COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-WORKDIR /ifcbdb
-COPY environment.yml /envs/ifcbdb_env.yml
+# Install some GDAL requirements
+RUN apt-get update && apt-get upgrade -y \
+	&& apt-get install -y --no-install-recommends \
+	libgdal20 \
+	&& rm -rf /var/lib/apt/lists/*
 
-WORKDIR /envs
-RUN conda-merge pyifcb_env.yml ifcbdb_env.yml > merged-environment.yml
-RUN cat merged-environment.yml
+# Create and switch to a non-root user
+RUN useradd --create-home appuser
+USER appuser
 
-RUN conda env update -n root -f merged-environment.yml
-
-WORKDIR /pyifcb
-RUN python setup.py develop
+# Copy Django project
+WORKDIR /home/appuser/ifcbdb
+COPY ifcbdb .
 
 EXPOSE 8000
 
-# descend into app directory
-WORKDIR /ifcbdb
-
-CMD gunicorn --bind :8000 ifcbdb.wsgi:application --reload
+CMD gunicorn --bind :8000 ifcbdb.wsgi:application

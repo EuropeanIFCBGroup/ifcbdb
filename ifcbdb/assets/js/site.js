@@ -1,6 +1,8 @@
 // TODO: Move default location to settings
-var defaultLat = 41.5507768;
-var defaultLng = -70.6593102;
+// var defaultLat = 41.5507768;
+// var defaultLng = -70.6593102;
+var defaultLat = 59.78;
+var defaultLng = 21.37;
 var minLatitude = -180;
 var minLongitude = -180;
 var zoomLevel = 6;
@@ -450,7 +452,7 @@ function initBinFilter(binFilterMode) {
 
 function applyFilters() {
     var dataset = $(".popover .dataset-filter").val();
-    var instrument = $(".popover .instrument-filter").val(); 
+    var instrument = $(".popover .instrument-filter").val();
     var cruise = $(".popover .cruise-filter").val();
     var sampleType = $(".popover .sample-type-filter").val();
     var tags = $(".popover .tag-filter option:selected")

@@ -1,0 +1,19 @@
+celery
+django
+gdal==2.4.0 # Needs to match `gdal-config --version`
+gunicorn
+h5py
+numba
+pandas
+pip-tools
+psycopg2-binary
+pycrypto # No longer maintained, cryptography or pycryptodome should be used instead
+pysmb
+python-memcached
+pyyaml
+rectpack
+redis
+requests
+scikit-image
+scipy
+wheel

@@ -20,12 +20,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ju3ugk&gwd&tf7=l!5^o(&j^5ha22yq9ov%^mx%%s4-gw0-a0#'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ.get('DEBUG', default=0))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(' ')
+
+# Used to encrypt/decrypt samba passwords for connecting to IFCB
+IFCB_PASSWORD_KEY = os.environ.get('IFCB_PASSWORD_KEY')
 
 
 # Application definition
@@ -79,11 +81,11 @@ WSGI_APPLICATION = 'ifcbdb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'ifcb',
-        'USER': 'ifcb',
-        'PASSWORD': 'ifcb',
-        'HOST': 'postgres',  # <-- IMPORTANT: same name as docker-compose service!
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'), # <-- IMPORTANT: same name as docker-compose service!
+        'PORT': os.environ.get('POSTGRES_PORT'),
     }
 }
 
@@ -140,7 +142,6 @@ CELERY_TASK_TRACK_STARTED = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/static'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
@@ -149,8 +150,3 @@ STATICFILES_DIRS = [
 LOGIN_URL = 'secure:login'
 LOGIN_REDIRECT_URL = 'secure:index'
 LOGOUT_REDIRECT_URL = 'secure:login'
-
-try:
-    from .local_settings import *
-except ImportError as e:
-    raise ImportError('local settings not found') from e

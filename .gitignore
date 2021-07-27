@@ -109,13 +109,8 @@ venv.bak/
 
 # IDEs
 .idea/
-
-# ifcbdb specific stuff
-nginx/ifcbdb.conf
-pyifcb
-pg_data
-ifcb_data
-static
-
 .DS_Store
 .vscode
+
+# Nginx
+nginx.conf

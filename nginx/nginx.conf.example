@@ -11,15 +11,15 @@ server {
 
     location /static/ {
         alias /static/;
-        autoindex on;
+        autoindex off;
     }
 
     location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-	proxy_set_header Host $http_host;
+	    proxy_set_header Host $http_host;
         proxy_redirect off;
-	proxy_http_version 1.1;
-	proxy_set_header Connection "";
+	    proxy_http_version 1.1;
+	    proxy_set_header Connection "";
 
         if (!-f $request_filename) {
             proxy_pass http://ifcbdb_server;

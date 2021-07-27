@@ -1,19 +1,10 @@
-version: '3'
-
 services:
   ifcbdb:
     build: .
     container_name: ifcbdb
+    env_file: .env
     volumes:
-      - ./pyifcb:/pyifcb
-      - ./ifcbdb:/ifcbdb
-      - ./static:/static
-      - ./ifcb_data:/data
-    networks:
-      - nginx_network
-      - postgres_network
-      - memcached_network
-      - redis_network
+      - ../raw:/home/appuser/raw
     depends_on:
       - postgres
       - memcached
@@ -23,63 +14,39 @@ services:
     build: .
     container_name: celery
     command: celery -A ifcbdb worker -l info
+    env_file: .env
     volumes:
-      - ./pyifcb:/pyifcb
-      - ./ifcbdb:/ifcbdb
-      - ./ifcb_data:/data
+      - ../raw:/home/appuser/raw
     depends_on:
       - postgres
       - memcached
       - redis
-    networks:
-      - redis_network
-      - postgres_network
-      - memcached_network
 
   nginx:
-    image: nginx:1.15
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
     container_name: nginx
     ports:
-      - 8000:80
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./static:/static
+      - 80:80
     depends_on:
       - ifcbdb
-    networks:
-      - nginx_network
 
   postgres:
-    image: mdillon/postgis:11-alpine
+    image: postgis/postgis:13-3.1-alpine
     container_name: postgres
-    environment:
-      - POSTGRES_USER=ifcb
-      - POSTGRES_PASSWORD=ifcb
-      - POSTGRES_DB=ifcb
+    env_file: .env
     volumes:
-      - ./pg_data:/var/lib/postgresql/data
-    networks:
-      - postgres_network
+      - pg_data:/var/lib/postgresql/data
 
   memcached:
-    image: memcached:1.5.12-alpine
+    image: memcached:1.6-alpine
     container_name: memcached
-    command: ["-m", "64m"]
-    networks:
-      - memcached_network
+    command: ['-m', '64m']
 
   redis:
-    image: redis:5.0.4-alpine
+    image: redis:6.2-alpine
     container_name: redis
-    networks:
-      - redis_network
 
-networks:
-  nginx_network:
-    driver: bridge
-  postgres_network:
-    driver: bridge
-  memcached_network:
-    driver: bridge
-  redis_network:
-    driver: bridge
+volumes:
+  pg_data:
