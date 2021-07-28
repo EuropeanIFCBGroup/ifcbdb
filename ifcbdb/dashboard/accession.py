@@ -54,7 +54,7 @@ class Accession(object):
         for dd in self.dataset.directories.filter(kind=DataDirectory.RAW).order_by('priority'):
             if not os.path.exists(dd.path):
                 continue # skip and continue searching
-            directory = ifcb.DataDirectory(dd.path)
+            directory = ifcb.DataDirectory(dd.path, validate=False)
             for b in directory:
                 yield b
     def sync_one(self, pid):
@@ -62,7 +62,7 @@ class Accession(object):
         for dd in self.dataset.directories.filter(kind=DataDirectory.RAW).order_by('priority'):
             if not os.path.exists(dd.path):
                 continue # skip and continue searching
-            directory = ifcb.DataDirectory(dd.path)
+            directory = ifcb.DataDirectory(dd.path, validate=False)
             try:
                 bin = directory[pid]
             except KeyError:
@@ -85,7 +85,7 @@ class Accession(object):
         })
         if not created and not dataset in b.datasets:
             self.dataset.bins.add(b)
-            return 
+            return
         b2s, error = self.add_bin(bin, b)
         if error is not None:
             # there was an error. if we created a bin, delete it
@@ -335,7 +335,7 @@ def import_metadata(metadata_dataframe, progress_callback=do_nothing):
                     ts = pd.to_datetime(ts_str, utc=True)
                     if not pd.isnull(ts):
                         b.sample_time = ts
-           
+
             if lat_col is not None and lon_col is not None:
                 lat = get_cell(row, lat_col)
                 lon = get_cell(row, lon_col)
@@ -413,7 +413,7 @@ def import_metadata(metadata_dataframe, progress_callback=do_nothing):
 
             n_modded += 1
             b.save()
-            
+
             if n_modded % progress_batch_size == 0:
                 should_continue = progress_callback(import_progress(b.pid, n_modded, errors))
 
@@ -492,7 +492,7 @@ def export_metadata(ds, bins):
         tag_names = tags_by_id[item['id']]
         for i in range(n_tag_cols):
             v = tag_names[i] if i < len(tag_names) else ''
-            r[f'tag{i+1}'].append(v) 
+            r[f'tag{i+1}'].append(v)
         r['skip'].append(1 if item['skip'] else 0)
 
     df = pd.DataFrame(r)
