@@ -18,23 +18,23 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY requirements.txt .
 RUN pip install -U pip \
 	&& pip install -r requirements.txt \
-	&& git clone https://github.com/joefutrelle/pyifcb \
+	&& git clone https://github.com/veot/pyifcb \
 	&& pip install ./pyifcb
 
 # ------------------------ RUN ------------------------ #
 
 FROM python:3.9-slim-buster
 
-# Copy production ready venv from builder
-ENV VIRTUAL_ENV="/opt/venv"
-COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
 # Install some GDAL requirements
 RUN apt-get update && apt-get upgrade -y \
 	&& apt-get install -y --no-install-recommends \
 	libgdal20 \
 	&& rm -rf /var/lib/apt/lists/*
+
+# Copy production ready venv from builder
+ENV VIRTUAL_ENV="/opt/venv"
+COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Create and switch to a non-root user
 RUN useradd --create-home appuser
