@@ -142,6 +142,7 @@ CELERY_TASK_TRACK_STARTED = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/home/appuser/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
