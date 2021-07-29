@@ -25,7 +25,7 @@
            name="{{ form.username.html_name }}" value="{{ form.username.value|default:'' }}"
            type="text" placeholder="Username" />
 
-    <input class="form-control mb-4 " id="{{ form.password.id_for_label }}" maxlength="30"
+    <input class="form-control mb-4 " id="{{ form.password.id_for_label }}" maxlength="128"
            name="{{ form.password.html_name }}" value="{{ form.password.value|default:'' }}"
            type="password" placeholder="Password" />
 
