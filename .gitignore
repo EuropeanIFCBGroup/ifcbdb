@@ -114,3 +114,6 @@ venv.bak/
 
 # Nginx
 nginx.conf
+
+# Docker
+docker-compose.yml
