@@ -29,6 +29,8 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(' ')
 # Used to encrypt/decrypt samba passwords for connecting to IFCB
 IFCB_PASSWORD_KEY = os.environ.get('IFCB_PASSWORD_KEY')
 
+# Get rid of auto primary key warning
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Application definition
 
