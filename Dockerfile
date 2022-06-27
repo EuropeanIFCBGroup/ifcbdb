@@ -1,6 +1,6 @@
 # ------------------------ BUILD ----------------------- #
 
-FROM python:3.9-slim-buster AS builder
+FROM python:3.9-slim-bullseye AS builder
 
 # Install build requirements
 RUN apt-get update && apt-get upgrade -y \
@@ -16,19 +16,21 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install Python requirements
 COPY requirements.txt .
+# setuptools<58 needed to fix gdal<3.3 issue https://github.com/pypa/setuptools/issues/2781
 RUN pip install -U pip \
+    && pip install 'setuptools<58.0.0' \ 
 	&& pip install -r requirements.txt \
-	&& git clone https://github.com/veot/pyifcb \
-	&& pip install ./pyifcb
+    && git clone https://github.com/joefutrelle/pyifcb \
+    && pip install ./pyifcb
 
 # ------------------------ RUN ------------------------ #
 
-FROM python:3.9-slim-buster
+FROM python:3.9-slim-bullseye
 
 # Install some GDAL requirements
 RUN apt-get update && apt-get upgrade -y \
 	&& apt-get install -y --no-install-recommends \
-	libgdal20 \
+	libgdal28 \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Copy production ready venv from builder

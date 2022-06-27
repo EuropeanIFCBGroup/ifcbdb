@@ -1,6 +1,6 @@
 celery
 django
-gdal==2.4.0 # Needs to match `gdal-config --version`
+gdal==3.2.2 # Needs to match `gdal-config --version`
 gunicorn
 h5py
 numba

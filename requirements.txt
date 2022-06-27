@@ -37,7 +37,7 @@ decorator==4.4.2
     # via networkx
 django==3.2.5
     # via -r requirements.in
-gdal==2.4.0
+gdal==3.2.2
     # via -r requirements.in
 gunicorn==20.1.0
     # via -r requirements.in
