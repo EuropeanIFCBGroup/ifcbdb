@@ -20,7 +20,7 @@ COPY requirements.txt .
 RUN pip install -U pip \
     && pip install 'setuptools<58.0.0' \ 
 	&& pip install -r requirements.txt \
-    && git clone https://github.com/joefutrelle/pyifcb \
+    && git clone https://github.com/veot/pyifcb \
     && pip install ./pyifcb
 
 # ------------------------ RUN ------------------------ #
